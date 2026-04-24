@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis PLB Informatika - Versi Scroll</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap');
+
+        :root {
+            --sky-blue: #e0f2fe;
+            --ocean-blue: #0284c7;
+            --pastel-sun: #fef08a;
+        }
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background-color: var(--sky-blue);
+            color: #1e293b;
+            /* Perbaikan: Mengaktifkan scroll */
+            overflow-y: auto;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px 0;
+        }
+
+        /* Animasi Matahari */
+        .sun {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            width: 70px;
+            height: 70px;
+            background-color: var(--pastel-sun);
+            border-radius: 50%;
+            box-shadow: 0 0 30px #fde047;
+            animation: pulse 4s infinite;
+            z-index: 1;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; }
+        }
+
+        /* Animasi Burung Terbang Latar Belakang */
+        .bird-bg {
+            position: fixed;
+            z-index: 0;
+            color: #94a3b8;
+            font-size: 24px;
+            animation: fly-bg 15s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes fly-bg {
+            0% { left: -50px; top: 20%; }
+            100% { left: 110%; top: 25%; }
+        }
+
+        /* Kontainer Kuis */
+        .glass-container {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 30px;
+            border: 4px solid white;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+            width: 95%;
+            max-width: 650px;
+            padding: 2rem;
+            margin: 40px auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        .option-btn {
+            width: 100%;
+            padding: 16px;
+            margin: 10px 0;
+            background: white;
+            border: 2px solid #bae6fd;
+            border-radius: 18px;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .option-btn:hover:not(:disabled) {
+            background: #f0f9ff;
+            border-color: #0284c7;
+            transform: translateX(5px);
+        }
+
+        /* Overlays Feedback */
+        .feedback-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            background: rgba(224, 242, 254, 0.95);
+        }
+
+        /* Animasi Menabrak Layar (Kraakk) */
+        .crash-bird {
+            font-size: 120px;
+            color: #475569;
+            animation: bird-crash-anim 0.5s cubic-bezier(0.36, 0, 0.66, -0.56) forwards;
+        }
+
+        @keyframes bird-crash-anim {
+            0% { transform: scale(0) rotate(0deg); opacity: 0; }
+            100% { transform: scale(1.5) rotate(15deg); opacity: 1; }
+        }
+
+        .crack-text {
+            font-size: 60px;
+            font-weight: 900;
+            color: #b91c1c;
+            text-shadow: 4px 4px 0 white;
+            animation: shake 0.2s infinite;
+        }
+
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(3px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -1px) rotate(1deg); }
+        }
+
+        /* Progress Bar */
+        .timer-container {
+            width: 100%;
+            height: 12px;
+            background: #f1f5f9;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        .timer-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #38bdf8, #0284c7);
+            width: 100%;
+            transition: width 1s linear;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Elemen Latar Belakang -->
+    <div class="sun"></div>
+    <div class="bird-bg"><i class="fas fa-dove"></i></div>
+
+    <!-- TAMPILAN AWAL -->
+    <div id="start-screen" class="glass-container text-center">
+        <div class="flex justify-center mb-6">
+            <div class="w-32 h-32 bg-sky-100 rounded-full flex items-center justify-center text-sky-600 text-6xl">
+                <i class="fas fa-rocket"></i>
+            </div>
+        </div>
+        <h1 class="text-3xl font-bold text-sky-900 mb-2">Safari Kuis PLB</h1>
+        <p class="text-gray-600 mb-8">Uji pengetahuanmu tentang Praktik Lintas Bidang Informatika Kelas 8. Siap untuk Level Up?</p>
+        <button onclick="startQuiz()" class="w-full bg-sky-600 text-white px-8 py-4 rounded-2xl font-bold text-xl shadow-lg hover:bg-sky-700 transition transform hover:scale-105">
+            Mulai Kuis Sekarang! 🚀
+        </button>
+    </div>
+
+    <!-- TAMPILAN KUIS -->
+    <div id="quiz-screen" class="glass-container hidden">
+        <div class="flex justify-between items-center mb-2">
+            <span id="level-tag" class="px-4 py-1 bg-sky-600 text-white rounded-full text-sm font-bold shadow-sm">Level 1</span>
+            <div class="text-sky-800 font-bold">Skor: <span id="current-score" class="text-2xl">0</span></div>
+        </div>
+        
+        <div class="timer-container">
+            <div id="timer-bar" class="timer-fill"></div>
+        </div>
+
+        <div id="question-area">
+            <h2 id="question-text" class="text-xl md:text-2xl font-bold text-slate-800 mb-6 leading-tight">Sedang memuat pertanyaan...</h2>
+            <div id="options-box" class="space-y-2">
+                <!-- Tombol Pilihan Jawaban -->
+            </div>
+        </div>
+    </div>
+
+    <!-- TAMPILAN HASIL AKHIR -->
+    <div id="result-screen" class="glass-container text-center hidden">
+        <div class="text-7xl mb-4 text-yellow-400"><i class="fas fa-trophy"></i></div>
+        <h1 class="text-3xl font-bold text-sky-900 mb-2">Misi Selesai!</h1>
+        <p class="text-gray-500 mb-6">Kamu telah menyelesaikan semua tantangan Praktik Lintas Bidang.</p>
+        
+        <div class="bg-white p-6 rounded-3xl shadow-inner mb-8 border-2 border-sky-100">
+            <p class="text-gray-400 font-bold uppercase text-xs tracking-widest mb-1">Total Nilaimu</p>
+            <p id="final-score" class="text-6xl font-bold text-sky-600">0</p>
+        </div>
+
+        <button onclick="location.reload()" class="w-full bg-sky-600 text-white py-4 rounded-2xl font-bold text-lg shadow-lg">Main Lagi 🔄</button>
+    </div>
+
+    <!-- OVERLAYS FEEDBACK -->
+    <!-- Benar: Tepuk Tangan -->
+    <div id="overlay-correct" class="feedback-overlay">
+        <div class="text-9xl mb-6 animate-bounce">👏</div>
+        <h2 class="text-4xl font-bold text-sky-900">HEBAT!</h2>
+        <p class="text-xl text-sky-700 mt-2">Jawabanmu Benar!</p>
+    </div>
+
+    <!-- Salah: Wajah Sedih -->
+    <div id="overlay-wrong" class="feedback-overlay">
+        <div class="text-9xl mb-6 opacity-80" style="animation: shake 0.5s infinite">😢</div>
+        <h2 class="text-4xl font-bold text-red-700">WADUH!</h2>
+        <p class="text-xl text-red-600 mt-2">Kurang Tepat, Coba Lagi Ya!</p>
+    </div>
+
+    <!-- Waktu Habis: Burung Tabrak Layar -->
+    <div id="overlay-timeout" class="feedback-overlay" style="background: rgba(15, 23, 42, 0.98);">
+        <div class="crash-bird"><i class="fas fa-dove"></i></div>
+        <div class="crack-text">KRAAAKKK!</div>
+        <h2 class="text-3xl font-bold text-white mt-4 uppercase">Waktu Habis!</h2>
+        <p class="text-gray-400">Burung menabrak layar karena kamu terlalu lama!</p>
+    </div>
+
+    <script>
+        // Data Soal 10 Soal Berdasarkan Materi PLB Buku Informatika Kelas 8
+        const quizData = [
+            { level: 1, title: "Mudah", time: 15, questions: [
+                { q: "Apa kunci utama keberhasilan sebuah proyek Praktik Lintas Bidang?", a: ["Bekerja sendirian", "Kolaborasi dan kerja tim", "Menggunakan komputer tercanggih", "Mencari kunci jawaban di internet"], c: 1 },
+                { q: "Proses memecah masalah besar menjadi bagian-bagian kecil disebut...", a: ["Algoritma", "Abstraksi", "Dekomposisi", "Pengenalan Pola"], c: 2 },
+                { q: "Mengapa kita membutuhkan media komunikasi digital saat kerja kelompok?", a: ["Agar bisa bermain game", "Untuk saling berbagi ide dan file secara cepat", "Hanya untuk bergaya", "Agar baterai HP cepat habis"], c: 1 }
+            ]},
+            { level: 2, title: "Sedang", time: 12, questions: [
+                { q: "Dalam siklus pembuatan aplikasi, tahap apa yang dilakukan setelah Perencanaan?", a: ["Perancangan (Design)", "Pengujian (Testing)", "Penjualan", "Penghapusan"], c: 0 },
+                { q: "Diagram alir yang menggambarkan logika program disebut...", a: ["Drawing", "Flowchart", "Sketch", "Map"], c: 1 },
+                { q: "Salah satu contoh praktik lintas bidang adalah Smart Farming, yaitu gabungan Informatika dengan...", a: ["Seni Tari", "Olahraga", "Pertanian", "Kedokteran"], c: 2 },
+                { q: "Tahap 'Coding' disebut juga dengan tahap...", a: ["Dokumentasi", "Evaluasi", "Implementasi", "Planning"], c: 2 }
+            ]},
+            { level: 3, title: "Sulit", time: 10, questions: [
+                { q: "Tahap akhir untuk memastikan program tidak memiliki kesalahan (bug) adalah...", a: ["Pengujian (Testing)", "Perancangan", "Pemasaran", "Dekomposisi"], c: 0 },
+                { q: "Aplikasi pengingat kesehatan (fitness tracker) adalah kolaborasi informatika dengan bidang...", a: ["Astronomi", "Kesehatan dan Olahraga", "Kelautan", "Sejarah"], c: 1 },
+                { q: "Apa manfaat dokumentasi dalam sebuah proyek Praktik Lintas Bidang?", a: ["Agar terlihat sibuk", "Menghabiskan kertas", "Sebagai panduan cara kerja dan pemeliharaan produk", "Agar aplikasi tidak laku"], c: 2 }
+            ]}
+        ];
+
+        let currentLevelIdx = 0;
+        let currentQuesIdx = 0;
+        let score = 0;
+        let timerInterval;
+        let timeLeft;
+        let canAnswer = true;
+
+        function startQuiz() {
+            document.getElementById('start-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('hidden');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            canAnswer = true;
+            const levelSet = quizData[currentLevelIdx];
+            const qData = levelSet.questions[currentQuesIdx];
+            
+            document.getElementById('level-tag').innerText = `Level ${levelSet.level} - ${levelSet.title}`;
+            document.getElementById('question-text').innerText = qData.q;
+            
+            const optionsBox = document.getElementById('options-box');
+            optionsBox.innerHTML = '';
+            
+            qData.a.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn shadow-sm';
+                btn.innerHTML = `<span class="inline-block w-8 h-8 bg-sky-100 text-sky-600 rounded-full text-center leading-8 mr-3 font-bold">${idx + 1}</span> ${opt}`;
+                btn.onclick = () => checkAnswer(idx);
+                optionsBox.appendChild(btn);
+            });
+
+            startTimer(levelSet.time);
+            // Scroll ke posisi kuis
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function startTimer(seconds) {
+            clearInterval(timerInterval);
+            timeLeft = seconds;
+            updateTimerBar();
+            
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerBar();
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    if (canAnswer) showFeedback('timeout');
+                }
+            }, 1000);
+        }
+
+        function updateTimerBar() {
+            const total = quizData[currentLevelIdx].time;
+            const percentage = (timeLeft / total) * 100;
+            document.getElementById('timer-bar').style.width = Math.max(0, percentage) + '%';
+        }
+
+        function checkAnswer(idx) {
+            if (!canAnswer) return;
+            canAnswer = false;
+            clearInterval(timerInterval);
+
+            const correct = quizData[currentLevelIdx].questions[currentQuesIdx].c;
+            
+            if (idx === correct) {
+                score += (currentLevelIdx + 1) * 10;
+                document.getElementById('current-score').innerText = score;
+                showFeedback('correct');
+            } else {
+                showFeedback('wrong');
+            }
+        }
+
+        function showFeedback(type) {
+            const overlay = document.getElementById(`overlay-${type}`);
+            overlay.style.display = 'flex';
+
+            setTimeout(() => {
+                overlay.style.display = 'none';
+                nextStep();
+            }, 2500);
+        }
+
+        function nextStep() {
+            currentQuesIdx++;
+            if (currentQuesIdx >= quizData[currentLevelIdx].questions.length) {
+                currentLevelIdx++;
+                currentQuesIdx = 0;
+            }
+
+            if (currentLevelIdx < quizData.length) {
+                loadQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        function showResult() {
+            document.getElementById('quiz-screen').classList.add('hidden');
+            document.getElementById('result-screen').classList.remove('hidden');
+            document.getElementById('final-score').innerText = score;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
